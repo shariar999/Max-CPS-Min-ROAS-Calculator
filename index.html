@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Max CPC & Min ROAS Calculator | By Shariar Mojumder</title>
+  <meta name="description" content="Free Max CPC & Minimum ROAS Calculator for digital marketers. Find the maximum you should bid per click and the minimum ROAS needed to stay profitable." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --ink:        #0D0F14;
+      --ink-2:      #3A3D47;
+      --ink-3:      #7B7F8E;
+      --surface:    #F7F8FC;
+      --card:       #FFFFFF;
+      --border:     #E4E7F0;
+      --border-2:   #C9CEDF;
+      --accent:     #6C3BFF;
+      --accent-2:   #9B6BFF;
+      --accent-glow:#6C3BFF22;
+      --green:      #0EA15E;
+      --green-light:#ECFAF4;
+      --orange:     #F76B1C;
+      --orange-light:#FFF4EC;
+      --radius-sm:  8px;
+      --radius:     14px;
+      --radius-lg:  20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--surface);
+      color: var(--ink);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ── TOP NAV BAR ── */
+    .topbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--ink);
+      letter-spacing: -.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .topbar-logo .dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .topbar-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-glow);
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: .4px;
+    }
+
+    /* ── PAGE WRAPPER ── */
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 5rem;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 0 0 2.75rem;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.1rem;
+    }
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      display: block;
+      width: 28px; height: 1px;
+      background: var(--accent-2);
+      opacity: .5;
+    }
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.1rem);
+      font-weight: 700;
+      letter-spacing: -.8px;
+      line-height: 1.1;
+      color: var(--ink);
+      margin-bottom: .8rem;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(100deg, var(--accent) 20%, var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: .975rem;
+      color: var(--ink-3);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 5px;
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px 12px;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--ink-3);
+      cursor: pointer;
+      transition: all .18s;
+      text-align: center;
+    }
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+    .tab:not(.active):hover { background: var(--surface); color: var(--ink); }
+
+    /* ── PANELS ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.25rem;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.4rem;
+    }
+    .card-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--accent-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--ink-2);
+    }
+
+    /* ── FIELDS ── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.1rem;
+    }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink-2);
+      letter-spacing: .1px;
+    }
+    .field .hint {
+      font-size: 11px;
+      color: var(--ink-3);
+      margin-top: 2px;
+    }
+    .input-wrap { position: relative; }
+    .input-wrap .sym {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--ink-3);
+      pointer-events: none;
+      user-select: none;
+    }
+    .sym.left  { left: 12px; }
+    .sym.right { right: 12px; }
+    .input-wrap input {
+      width: 100%;
+      height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink);
+      background: var(--surface);
+      padding: 0 36px 0 36px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .input-wrap input.no-left  { padding-left: 12px; }
+    .input-wrap input.no-right { padding-right: 12px; }
+    .input-wrap input:focus {
+      border-color: var(--accent);
+      background: var(--card);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .input-wrap input::placeholder { color: var(--border-2); }
+
+    /* ── RESULT HERO ── */
+    .result-hero {
+      background: linear-gradient(135deg, #6C3BFF 0%, #3B0FCC 100%);
+      border-radius: var(--radius-lg);
+      padding: 2rem 2.25rem 1.75rem;
+      margin-bottom: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .result-hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.07);
+    }
+    .result-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: 30%;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.05);
+    }
+    .result-hero-top {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .result-hero-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 4px;
+    }
+    .result-hero-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.6rem, 6vw, 3.8rem);
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+    .result-hero-sub {
+      font-size: 12.5px;
+      color: rgba(255,255,255,.6);
+      margin-top: 5px;
+    }
+    .result-status {
+      background: rgba(255,255,255,.15);
+      border-radius: 10px;
+      padding: 8px 14px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .result-status-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+    }
+    .result-status-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 2px;
+    }
+    /* ── METRIC GRID ── */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .75rem;
+      position: relative;
+      z-index: 1;
+    }
+    .metric {
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(4px);
+      border-radius: 11px;
+      padding: .9rem 1rem;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .metric-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+    }
+    .metric-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: rgba(255,255,255,.6);
+      margin-top: 5px;
+      letter-spacing: .3px;
+    }
+
+    /* ── INSIGHT BANNER ── */
+    .insight {
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .insight.good  { background: var(--green-light);  color: #065F3A; border: 1px solid #B2EBCF; }
+    .insight.warn  { background: var(--orange-light); color: #7A3000; border: 1px solid #FBD2AA; }
+    .insight-icon  { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .insight strong { font-weight: 700; }
+
+    /* ── FORMULA CARD ── */
+    .formula-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 2rem;
+      margin-bottom: 1.25rem;
+    }
+    .formula-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .76rem;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 1rem;
+    }
+    .formula-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: .75rem 1rem;
+      font-size: 13.5px;
+      color: var(--ink-2);
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: .6rem;
+      letter-spacing: .1px;
+    }
+    .formula-row strong { color: var(--accent); }
+    .formula-tip {
+      font-size: 12px;
+      color: var(--ink-3);
+      line-height: 1.6;
+    }
+
+    /* ── RESET ── */
+    .reset-btn {
+      display: block;
+      width: 100%;
+      padding: 11px;
+      border: 1.5px solid var(--border-2);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-3);
+      cursor: pointer;
+      transition: all .15s;
+      margin-top: .25rem;
+    }
+    .reset-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+
+    /* ── WHAT IS section ── */
+    .explain {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-top: 2.5rem;
+    }
+    .explain h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+    .explain p {
+      font-size: 14px;
+      color: var(--ink-2);
+      line-height: 1.7;
+      margin-bottom: .85rem;
+    }
+    .explain p:last-child { margin-bottom: 0; }
+    .kv-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+      margin: 1.25rem 0;
+    }
+    .kv {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: .9rem 1rem;
+    }
+    .kv-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .kv-text {
+      font-size: 13px;
+      color: var(--ink-2);
+      line-height: 1.5;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 3rem 0 0;
+      font-size: 12.5px;
+      color: var(--ink-3);
+    }
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer-made {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      padding: 7px 16px;
+      margin-bottom: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink-2);
+    }
+    .footer-made .heart { color: #FF4D6D; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 560px) {
+      .page { padding: 2rem 1rem 4rem; }
+      .topbar { padding: 0 1rem; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .kv-grid { grid-template-columns: 1fr; }
+      .card { padding: 1.25rem; }
+      .result-hero { padding: 1.5rem; }
+      .result-hero-top { flex-direction: column; align-items: flex-start; gap: .8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── TOP BAR ── -->
+<header class="topbar">
+  <div class="topbar-logo">
+    <span class="dot"></span>
+    PPC Tools
+  </div>
+  <div class="topbar-badge">Free Calculator</div>
+</header>
+
+<!-- ── PAGE ── -->
+<main class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Free PPC Tool</div>
+    <h1>Max CPC &amp; <em>Min ROAS</em><br>Calculator</h1>
+    <p>Find the maximum you should bid per click and the minimum ROAS needed to break even — before you spend a single taka.</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs" role="tablist">
+    <button class="tab active" onclick="switchTab('cpc', this)" role="tab">📈 Max CPC</button>
+    <button class="tab" onclick="switchTab('roas', this)" role="tab">🎯 Min ROAS</button>
+    <button class="tab" onclick="switchTab('both', this)" role="tab">⚡ Combined View</button>
+  </div>
+
+  <!-- ══════════════════════════ TAB: MAX CPC ══════════════════════════ -->
+  <div class="panel active" id="panel-cpc">
+
+    <!-- INPUTS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📥</div>
+        <div class="card-title">Your Campaign Numbers</div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="cpc-aov">Average Order Value (AOV)</label>
+          <div class="input-wrap">
+            <span class="sym left">৳</span>
+            <input type="number" id="cpc-aov" min="0" step="1" value="2000" class="no-right" oninput="calcCPC()" />
+          </div>
+          <div class="hint">Average revenue earned per sale</div>
+        </div>
+        <div class="field">
+          <label for="cpc-margin">Gross Profit Margin</label>
+          <div class="input-wrap">
+            <input type="number" id="cpc-margin" min="0" max="100" step="0.1" value="40" class="no-left" oninput="calcCPC()" />
+            <span class="sym right">%</span>
+          </div>
+          <div class="hint">Revenue minus cost of goods sold</div>
+        </div>
+        <div class="field">
+          <label for="cpc-cvr">Website Conversion Rate</label>
+          <div class="input-wrap">
+            <input type="number" id="cpc-cvr" min="0" max="100" step="0.01" value="2.5" class="no-left" oninput="calcCPC()" />
+            <span class="sym right">%</span>
+          </div>
+          <div class="hint">% of visitors who purchase</div>
+        </div>
+        <div class="field">
+          <label for="cpc-overhead">Overhead / Ad Cost Factor</label>
+          <div class="input-wrap">
+            <input type="number" id="cpc-overhead" min="0" max="100" step="0.1" value="0" class="no-left" oninput="calcCPC()" />
+            <span class="sym right">%</span>
+          </div>
+          <div class="hint">Extra costs (agency fees, etc.) — optional</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="result-hero" id="cpc-result-block">
+      <div class="result-hero-top">
+        <div>
+          <div class="result-hero-label">Your Maximum CPC</div>
+          <div class="result-hero-val" id="cpc-result">৳0.00</div>
+          <div class="result-hero-sub">Maximum you should pay per click to break even</div>
+        </div>
+        <div class="result-status">
+          <div class="result-status-label">Profit / Sale</div>
+          <div class="result-status-val" id="cpc-profit">৳0</div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-val" id="cpc-m1">৳0</div>
+          <div class="metric-label">Max CPA</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val" id="cpc-m2">0%</div>
+          <div class="metric-label">Break-even ROAS</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val" id="cpc-m3">0</div>
+          <div class="metric-label">Clicks to Sale</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHT -->
+    <div class="insight good" id="cpc-insight">
+      <span class="insight-icon">✅</span>
+      <span id="cpc-insight-text">Enter your numbers above to see your bidding limit.</span>
+    </div>
+
+    <!-- FORMULA -->
+    <div class="formula-card">
+      <h3>How Max CPC is Calculated</h3>
+      <div class="formula-row"><strong>Profit / Sale</strong> = AOV × Margin %</div>
+      <div class="formula-row"><strong>Max CPA</strong> = Profit per Sale × (1 − Overhead %)</div>
+      <div class="formula-row"><strong>Max CPC</strong> = Max CPA × Conversion Rate %</div>
+      <p class="formula-tip">Example: ৳2,000 AOV × 40% margin = ৳800 profit. With 2.5% CVR → Max CPC = ৳800 × 0.025 = <strong>৳20</strong>. If your actual CPC is below this, your campaign can be profitable.</p>
+    </div>
+
+    <button class="reset-btn" onclick="resetCPC()">↺ Reset to defaults</button>
+  </div>
+
+  <!-- ══════════════════════════ TAB: MIN ROAS ══════════════════════════ -->
+  <div class="panel" id="panel-roas">
+
+    <!-- INPUTS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📊</div>
+        <div class="card-title">Your Cost & Revenue Data</div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="roas-margin">Gross Profit Margin</label>
+          <div class="input-wrap">
+            <input type="number" id="roas-margin" min="0.1" max="100" step="0.1" value="40" class="no-left" oninput="calcROAS()" />
+            <span class="sym right">%</span>
+          </div>
+          <div class="hint">Revenue minus cost of goods</div>
+        </div>
+        <div class="field">
+          <label for="roas-overhead">Total Overhead Rate</label>
+          <div class="input-wrap">
+            <input type="number" id="roas-overhead" min="0" max="100" step="0.1" value="10" class="no-left" oninput="calcROAS()" />
+            <span class="sym right">%</span>
+          </div>
+          <div class="hint">Agency fees, software, ops costs</div>
+        </div>
+        <div class="field">
+          <label for="roas-spend">Ad Spend (for context)</label>
+          <div class="input-wrap">
+            <span class="sym left">৳</span>
+            <input type="number" id="roas-spend" min="0" step="100" value="10000" class="no-right" oninput="calcROAS()" />
+          </div>
+          <div class="hint">Monthly or campaign budget</div>
+        </div>
+        <div class="field">
+          <label for="roas-revenue">Revenue Generated</label>
+          <div class="input-wrap">
+            <span class="sym left">৳</span>
+            <input type="number" id="roas-revenue" min="0" step="100" value="35000" class="no-right" oninput="calcROAS()" />
+          </div>
+          <div class="hint">Revenue from that spend</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="result-hero">
+      <div class="result-hero-top">
+        <div>
+          <div class="result-hero-label">Minimum ROAS to Break Even</div>
+          <div class="result-hero-val" id="roas-result">0%</div>
+          <div class="result-hero-sub">ROAS you must hit before you profit</div>
+        </div>
+        <div class="result-status">
+          <div class="result-status-label">Your Actual ROAS</div>
+          <div class="result-status-val" id="roas-actual">0%</div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-val" id="roas-m1">৳0</div>
+          <div class="metric-label">Net Profit</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val" id="roas-m2">0%</div>
+          <div class="metric-label">Net Margin</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val" id="roas-m3">0x</div>
+          <div class="metric-label">ROAS Headroom</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHT -->
+    <div class="insight good" id="roas-insight">
+      <span class="insight-icon">✅</span>
+      <span id="roas-insight-text">Enter your numbers above to see your ROAS target.</span>
+    </div>
+
+    <!-- FORMULA -->
+    <div class="formula-card">
+      <h3>How Min ROAS is Calculated</h3>
+      <div class="formula-row"><strong>Min ROAS</strong> = 1 ÷ (Margin % − Overhead %) × 100%</div>
+      <div class="formula-row"><strong>Actual ROAS</strong> = Revenue ÷ Ad Spend × 100%</div>
+      <div class="formula-row"><strong>Net Profit</strong> = Revenue × Margin% − Ad Spend − Overhead Cost</div>
+      <p class="formula-tip">Example: 40% margin with 10% overhead → effective margin = 30% → Min ROAS = 1 ÷ 0.30 × 100 = <strong>333%</strong>. If your actual ROAS is above this, your campaign is profitable.</p>
+    </div>
+
+    <button class="reset-btn" onclick="resetROAS()">↺ Reset to defaults</button>
+  </div>
+
+  <!-- ══════════════════════════ TAB: COMBINED ══════════════════════════ -->
+  <div class="panel" id="panel-both">
+
+    <!-- INPUTS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">All-in-One Inputs</div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="b-aov">Average Order Value</label>
+          <div class="input-wrap">
+            <span class="sym left">৳</span>
+            <input type="number" id="b-aov" min="0" step="1" value="2000" class="no-right" oninput="calcBoth()" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="b-margin">Gross Profit Margin</label>
+          <div class="input-wrap">
+            <input type="number" id="b-margin" min="0.1" max="100" step="0.1" value="40" class="no-left" oninput="calcBoth()" />
+            <span class="sym right">%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="b-cvr">Conversion Rate</label>
+          <div class="input-wrap">
+            <input type="number" id="b-cvr" min="0" max="100" step="0.01" value="2.5" class="no-left" oninput="calcBoth()" />
+            <span class="sym right">%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="b-overhead">Overhead Rate</label>
+          <div class="input-wrap">
+            <input type="number" id="b-overhead" min="0" max="100" step="0.1" value="10" class="no-left" oninput="calcBoth()" />
+            <span class="sym right">%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="b-spend">Monthly Ad Spend</label>
+          <div class="input-wrap">
+            <span class="sym left">৳</span>
+            <input type="number" id="b-spend" min="0" step="100" value="10000" class="no-right" oninput="calcBoth()" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="b-clicks">Expected Monthly Clicks</label>
+          <div class="input-wrap">
+            <input type="number" id="b-clicks" min="1" step="10" value="500" class="no-left no-right" oninput="calcBoth()" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMBINED RESULTS: two side-by-side output cards -->
+    <div class="grid-2" style="margin-bottom:1.25rem">
+      <div class="result-hero" style="margin-bottom:0">
+        <div class="result-hero-label">Max CPC</div>
+        <div class="result-hero-val" id="b-cpc" style="font-size:2.4rem">৳0</div>
+        <div class="result-hero-sub">Maximum bid per click</div>
+        <div class="metrics" style="grid-template-columns:1fr 1fr;margin-top:1rem">
+          <div class="metric">
+            <div class="metric-val" id="b-profit">৳0</div>
+            <div class="metric-label">Profit / Sale</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" id="b-cpa">৳0</div>
+            <div class="metric-label">Max CPA</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-hero" style="margin-bottom:0;background:linear-gradient(135deg,#0EA15E 0%,#065F3A 100%)">
+        <div class="result-hero-label">Min ROAS</div>
+        <div class="result-hero-val" id="b-roas" style="font-size:2.4rem">0%</div>
+        <div class="result-hero-sub">Minimum return on spend</div>
+        <div class="metrics" style="grid-template-columns:1fr 1fr;margin-top:1rem">
+          <div class="metric">
+            <div class="metric-val" id="b-beroas">0%</div>
+            <div class="metric-label">Break-even ROAS</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" id="b-proj">৳0</div>
+            <div class="metric-label">Projected Revenue</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insight -->
+    <div class="insight good" id="both-insight">
+      <span class="insight-icon">⚡</span>
+      <span id="both-insight-text">Enter your numbers to see a full profitability overview.</span>
+    </div>
+
+    <button class="reset-btn" onclick="resetBoth()">↺ Reset to defaults</button>
+  </div>
+
+  <!-- ══════════════════════════ EXPLANATION ══════════════════════════ -->
+  <div class="explain">
+    <h2>What are Max CPC & Min ROAS?</h2>
+    <p>Every paid advertising campaign has a profitability ceiling. <strong>Max CPC</strong> tells you the absolute maximum you can pay for a click and still break even — go above it and you're burning money, go below it and you have margin room to scale.</p>
+    <p><strong>Minimum ROAS</strong> is the flip side: the lowest return on ad spend that still covers your costs. If your campaign is below this threshold, every sale is losing you money even if you "sold something".</p>
+    <div class="kv-grid">
+      <div class="kv">
+        <div class="kv-label">Max CPC Formula</div>
+        <div class="kv-text">AOV × Margin% × CVR% = The most you should bid per click</div>
+      </div>
+      <div class="kv">
+        <div class="kv-label">Min ROAS Formula</div>
+        <div class="kv-text">1 ÷ Effective Margin × 100 = The ROAS floor for profitability</div>
+      </div>
+      <div class="kv">
+        <div class="kv-label">Why it matters</div>
+        <div class="kv-text">Bidding without these numbers is guessing. Know your ceiling before you set any bid.</div>
+      </div>
+      <div class="kv">
+        <div class="kv-label">When to use</div>
+        <div class="kv-text">Before launching any Google Ads, Meta Ads, or eCommerce campaign.</div>
+      </div>
+    </div>
+    <p>This calculator is built for digital marketers and business owners in Bangladesh and globally. All calculations happen instantly in your browser — no data is stored or sent anywhere.</p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-made">
+      Made with <span class="heart">♥</span> by <a href="https://www.linkedin.com/in/shariar-mojumder/" target="_blank" rel="noopener">Shariar Mojumder</a>
+    </div>
+    <br/>
+    Digital Marketing Specialist · Creative IT Institute (CITS), Dhaka
+    <br/><br/>
+    Free to use · No login required · Works 100% in your browser
+  </div>
+
+</main>
+
+<script>
+  // ── HELPERS ──
+  function tk(id) { return parseFloat(document.getElementById(id).value) || 0; }
+  function fmtBDT(n) { return '৳' + n.toLocaleString('en-BD', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+  function fmtPct(n) { return n.toFixed(1) + '%'; }
+
+  // ── TAB SWITCH ──
+  function switchTab(name, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // ══════════════════ MAX CPC ══════════════════
+  function calcCPC() {
+    const aov      = tk('cpc-aov');
+    const margin   = tk('cpc-margin') / 100;
+    const cvr      = tk('cpc-cvr')    / 100;
+    const overhead = tk('cpc-overhead') / 100;
+
+    const profitPerSale = aov * margin;
+    const maxCPA        = profitPerSale * (1 - overhead);
+    const maxCPC        = maxCPA * cvr;
+    const beROAS        = margin > 0 ? (1 / margin) * 100 : 0;
+    const clicksToSale  = cvr > 0 ? Math.round(1 / cvr) : 0;
+
+    document.getElementById('cpc-result').textContent  = fmtBDT(maxCPC);
+    document.getElementById('cpc-profit').textContent  = fmtBDT(profitPerSale);
+    document.getElementById('cpc-m1').textContent      = fmtBDT(maxCPA);
+    document.getElementById('cpc-m2').textContent      = fmtPct(beROAS);
+    document.getElementById('cpc-m3').textContent      = clicksToSale;
+
+    // insight
+    const ins = document.getElementById('cpc-insight');
+    const txt = document.getElementById('cpc-insight-text');
+    if (maxCPC > 0) {
+      ins.className = 'insight good';
+      txt.innerHTML = `<strong>Your Max CPC is ${fmtBDT(maxCPC)}.</strong> Keep your actual CPC below this to stay profitable. Your break-even ROAS is ${fmtPct(beROAS)} — any campaign above this is generating real margin.`;
+    } else {
+      ins.className = 'insight warn';
+      txt.innerHTML = `<strong>Check your inputs.</strong> Ensure margin and conversion rate are greater than zero.`;
+    }
+  }
+
+  function resetCPC() {
+    document.getElementById('cpc-aov').value     = 2000;
+    document.getElementById('cpc-margin').value  = 40;
+    document.getElementById('cpc-cvr').value     = 2.5;
+    document.getElementById('cpc-overhead').value= 0;
+    calcCPC();
+  }
+
+  // ══════════════════ MIN ROAS ══════════════════
+  function calcROAS() {
+    const margin   = tk('roas-margin')   / 100;
+    const overhead = tk('roas-overhead') / 100;
+    const spend    = tk('roas-spend');
+    const revenue  = tk('roas-revenue');
+
+    const effectiveMargin = margin - overhead;
+    const minROAS         = effectiveMargin > 0 ? (1 / effectiveMargin) * 100 : 0;
+    const actualROAS      = spend > 0 ? (revenue / spend) * 100 : 0;
+    const netProfit       = revenue * margin - spend - (spend * overhead);
+    const netMarginPct    = revenue > 0 ? (netProfit / revenue) * 100 : 0;
+    const headroom        = actualROAS > 0 && minROAS > 0 ? (actualROAS / minROAS).toFixed(2) + 'x' : '—';
+
+    document.getElementById('roas-result').textContent = fmtPct(minROAS);
+    document.getElementById('roas-actual').textContent = fmtPct(actualROAS);
+    document.getElementById('roas-m1').textContent     = fmtBDT(netProfit);
+    document.getElementById('roas-m2').textContent     = fmtPct(netMarginPct);
+    document.getElementById('roas-m3').textContent     = headroom;
+
+    // insight
+    const ins = document.getElementById('roas-insight');
+    const txt = document.getElementById('roas-insight-text');
+    if (minROAS > 0 && actualROAS > 0) {
+      if (actualROAS >= minROAS) {
+        ins.className = 'insight good';
+        txt.innerHTML = `<strong>Your campaign is profitable!</strong> Actual ROAS (${fmtPct(actualROAS)}) is above your minimum (${fmtPct(minROAS)}). You have ${headroom} headroom — consider scaling your budget.`;
+      } else {
+        ins.className = 'insight warn';
+        txt.innerHTML = `<strong>Below break-even.</strong> Your actual ROAS (${fmtPct(actualROAS)}) is below the minimum (${fmtPct(minROAS)}). You need ${fmtPct(minROAS - actualROAS)} more ROAS to stop losing money.`;
+      }
+    } else {
+      ins.className = 'insight warn';
+      txt.innerHTML = `<strong>Enter positive margin and spend</strong> to see your ROAS target.`;
+    }
+  }
+
+  function resetROAS() {
+    document.getElementById('roas-margin').value   = 40;
+    document.getElementById('roas-overhead').value = 10;
+    document.getElementById('roas-spend').value    = 10000;
+    document.getElementById('roas-revenue').value  = 35000;
+    calcROAS();
+  }
+
+  // ══════════════════ COMBINED ══════════════════
+  function calcBoth() {
+    const aov      = tk('b-aov');
+    const margin   = tk('b-margin')   / 100;
+    const cvr      = tk('b-cvr')      / 100;
+    const overhead = tk('b-overhead') / 100;
+    const spend    = tk('b-spend');
+    const clicks   = tk('b-clicks');
+
+    // CPC side
+    const profitPerSale     = aov * margin;
+    const maxCPA            = profitPerSale * (1 - overhead);
+    const maxCPC            = maxCPA * cvr;
+    const actualCPC         = clicks > 0 ? spend / clicks : 0;
+    const projectedSales    = Math.floor(clicks * cvr);
+    const projectedRevenue  = projectedSales * aov;
+
+    // ROAS side
+    const effectiveMargin   = margin - overhead;
+    const minROAS           = effectiveMargin > 0 ? (1 / effectiveMargin) * 100 : 0;
+    const beROAS            = margin > 0 ? (1 / margin) * 100 : 0;
+
+    document.getElementById('b-cpc').textContent    = fmtBDT(maxCPC);
+    document.getElementById('b-profit').textContent = fmtBDT(profitPerSale);
+    document.getElementById('b-cpa').textContent    = fmtBDT(maxCPA);
+    document.getElementById('b-roas').textContent   = fmtPct(minROAS);
+    document.getElementById('b-beroas').textContent = fmtPct(beROAS);
+    document.getElementById('b-proj').textContent   = fmtBDT(projectedRevenue);
+
+    // insight
+    const ins = document.getElementById('both-insight');
+    const txt = document.getElementById('both-insight-text');
+    const cpcOk = actualCPC > 0 && actualCPC <= maxCPC;
+    if (maxCPC > 0) {
+      const cpcStatus = actualCPC > 0
+        ? (cpcOk
+            ? `your projected CPC (${fmtBDT(actualCPC)}) is <strong>within budget</strong>`
+            : `your projected CPC (${fmtBDT(actualCPC)}) is <strong>above your max bid</strong>`)
+        : 'enter your expected clicks to compare your projected CPC';
+      ins.className = cpcOk || actualCPC === 0 ? 'insight good' : 'insight warn';
+      txt.innerHTML = `Max CPC: <strong>${fmtBDT(maxCPC)}</strong> &nbsp;|&nbsp; Min ROAS: <strong>${fmtPct(minROAS)}</strong> &nbsp;|&nbsp; Projected revenue from ${projectedSales} sales: <strong>${fmtBDT(projectedRevenue)}</strong>. With ${clicks} clicks, ${cpcStatus}.`;
+    }
+  }
+
+  function resetBoth() {
+    document.getElementById('b-aov').value     = 2000;
+    document.getElementById('b-margin').value  = 40;
+    document.getElementById('b-cvr').value     = 2.5;
+    document.getElementById('b-overhead').value= 10;
+    document.getElementById('b-spend').value   = 10000;
+    document.getElementById('b-clicks').value  = 500;
+    calcBoth();
+  }
+
+  // ── INIT ──
+  calcCPC();
+  calcROAS();
+  calcBoth();
+</script>
+</body>
+</html>
